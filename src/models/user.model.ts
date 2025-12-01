@@ -3,6 +3,9 @@ import { Iuser } from "../interface/Iuser.js";
 
 const userSchema = new mongoose.Schema<Iuser>(
   {
+    image: {
+      type: String,
+    },
     username: {
       type: String,
       required: true,

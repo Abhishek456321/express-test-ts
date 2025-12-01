@@ -12,8 +12,11 @@ export const createUser = async (req: Request, res: Response) => {
     return;
   }
   try {
+    const imageUrl =
+      req.protocol + "://" + req.get("host") + "/uploads/" + req.file?.filename;
     const hashedPassword = await hashPassword(newUser.password as string);
     newUser.password = hashedPassword as string;
+    newUser.image = imageUrl;
     const user = await userModel.create(newUser);
     if (user) {
       const token = generateJwtToken(user._id);

@@ -6,12 +6,13 @@ import {
 } from "../controllers/user.controller.js";
 import validateUser from "../middlewares/userCreationValidation.js";
 import validateLogin from "../middlewares/loginValidation.js";
+import { upload } from "../services/fileUpload.js";
 
 const userRouter = Router();
 
 userRouter
   .route("/")
-  .post(validateUser, createUser)
+  .post(validateUser, upload.single("image"), createUser)
   .get(validateLogin, loginUser);
 
 userRouter.route("/user").get(getAllUser);
