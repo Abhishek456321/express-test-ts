@@ -1,0 +1,78 @@
+import { Request, Response } from "express";
+import { Iuser } from "../interface/Iuser.js";
+import userModel from "../models/user.model.js";
+import { Ilogin } from "../interface/Ilogin.js";
+import hashPassword, { compareHashPassword } from "../services/hashing.js";
+import generateJwtToken from "../services/token.js";
+
+export const createUser = async (req: Request, res: Response) => {
+  const newUser = req.body as Iuser;
+  if (!newUser) {
+    res.json({ success: false, message: "No userDetails." });
+    return;
+  }
+  try {
+    const hashedPassword = await hashPassword(newUser.password as string);
+    newUser.password = hashedPassword as string;
+    const user = await userModel.create(newUser);
+    if (user) {
+      const token = generateJwtToken(user._id);
+      res.json({
+        success: true,
+        message: "user created successfully.",
+        token,
+      });
+      return;
+    }
+  } catch (error) {
+    res.json({ success: false, message: "server/db error." });
+    return;
+  }
+};
+
+export const loginUser = async (req: Request, res: Response) => {
+  const loginUser = req.body as Ilogin;
+  if (!loginUser) {
+    res.json({ success: false, message: "No userDetails." });
+    return;
+  }
+  try {
+    const user: Iuser | null = await userModel.findOne({
+      email: loginUser.email,
+    });
+    if (user) {
+      console.log(user);
+      const matchPassword = await compareHashPassword(
+        loginUser.password,
+        user?.password as string
+      );
+      if (matchPassword && user._id) {
+        const token = generateJwtToken(user._id?.toString());
+
+        res.json({
+          success: true,
+          message: "user login successfully.",
+          token,
+        });
+        return;
+      } else {
+        res.json({ success: false, message: "Invalid credentials." });
+        return;
+      }
+    }
+  } catch (error) {
+    res.json({ success: false, message: "server/db error." });
+  }
+};
+
+export const getAllUser = async (req: Request, res: Response) => {
+  try {
+    const users = await userModel.find();
+    if (users) {
+      res.json(users);
+      return;
+    }
+  } catch (error) {
+    res.json({ success: false, message: "server/db error." });
+  }
+};
