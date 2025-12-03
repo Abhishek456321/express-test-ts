@@ -20,6 +20,10 @@ const userSchema = new mongoose.Schema<Iuser>(
     googleId: {
       type: String,
     },
+    role: {
+      type: String,
+      default: "user",
+    },
   },
   { timestamps: true }
 );

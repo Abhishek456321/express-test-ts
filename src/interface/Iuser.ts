@@ -4,5 +4,6 @@ export interface Iuser {
   username: string;
   email: string;
   password?: string;
+  role: string;
   googleId?: string;
 }

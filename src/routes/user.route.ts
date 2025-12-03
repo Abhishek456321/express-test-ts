@@ -1,19 +1,16 @@
 import { Router } from "express";
-import {
-  createUser,
-  getAllUser,
-  loginUser,
-} from "../controllers/user.controller.js";
-import validateUser from "../middlewares/userCreationValidation.js";
+import { signUp, login, allUsers } from "../controllers/user.controller.js";
+
 import validateLogin from "../middlewares/loginValidation.js";
 import { upload } from "../services/fileUpload.js";
+
+import validateCreation from "../middlewares/userCreationValidation.js";
 
 const userRouter = Router();
 
 userRouter
   .route("/")
-  .post(validateUser, upload.single("image"), createUser)
-  .get(validateLogin, loginUser);
+  .post(validateCreation, upload.single("image"), signUp)
+  .get(validateLogin, login);
 
-userRouter.route("/user").get(getAllUser);
 export default userRouter;

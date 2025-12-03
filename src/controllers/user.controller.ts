@@ -5,7 +5,7 @@ import { Ilogin } from "../interface/Ilogin.js";
 import hashPassword, { compareHashPassword } from "../services/hashing.js";
 import generateJwtToken from "../services/token.js";
 
-export const createUser = async (req: Request, res: Response) => {
+export const signUp = async (req: Request, res: Response) => {
   const newUser = req.body as Iuser;
   if (!newUser) {
     res.json({ success: false, message: "No userDetails." });
@@ -19,10 +19,10 @@ export const createUser = async (req: Request, res: Response) => {
     newUser.image = imageUrl;
     const user = await userModel.create(newUser);
     if (user) {
-      const token = generateJwtToken(user._id);
+      const token = generateJwtToken(user._id, user.role);
       res.json({
         success: true,
-        message: "user created successfully.",
+        message: `${user.role} created successfully.`,
         token,
       });
       return;
@@ -33,7 +33,7 @@ export const createUser = async (req: Request, res: Response) => {
   }
 };
 
-export const loginUser = async (req: Request, res: Response) => {
+export const login = async (req: Request, res: Response) => {
   const loginUser = req.body as Ilogin;
   if (!loginUser) {
     res.json({ success: false, message: "No userDetails." });
@@ -44,17 +44,16 @@ export const loginUser = async (req: Request, res: Response) => {
       email: loginUser.email,
     });
     if (user) {
-      console.log(user);
       const matchPassword = await compareHashPassword(
         loginUser.password,
         user?.password as string
       );
       if (matchPassword && user._id) {
-        const token = generateJwtToken(user._id?.toString());
+        const token = generateJwtToken(user._id?.toString(), user.role);
 
         res.json({
           success: true,
-          message: "user login successfully.",
+          message: `${user.role} login successfully.`,
           token,
         });
         return;
@@ -68,7 +67,7 @@ export const loginUser = async (req: Request, res: Response) => {
   }
 };
 
-export const getAllUser = async (req: Request, res: Response) => {
+export const allUsers = async (req: Request, res: Response) => {
   try {
     const users = await userModel.find();
     if (users) {
