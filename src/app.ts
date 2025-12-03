@@ -10,6 +10,6 @@ console.log(process.cwd());
 console.log(path.join(process.cwd(), "/src/uploads"));
 app.use("/uploads", express.static(path.join(process.cwd(), "/src/uploads")));
 app.use(express.urlencoded({ extended: true }));
-app.use("/api/users", userRouter);
+app.use("/api/user", userRouter);
 app.use("/admin", adminRouter);
 export default app;

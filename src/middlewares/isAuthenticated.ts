@@ -5,7 +5,10 @@ const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
   if (!token)
     return res.json({ success: false, message: "Not authenticated." });
   try {
-    const decode = jwt.verify(token, process.env.JWT_SECRET_KEY as string);
+    const decode = jwt.verify(token, process.env.JWT_SECRET_KEY as string) as {
+      id: string;
+      role: string;
+    };
     req.user = decode;
 
     next();

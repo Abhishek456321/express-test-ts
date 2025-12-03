@@ -1,5 +1,10 @@
 import { Router } from "express";
-import { signUp, login, allUsers } from "../controllers/user.controller.js";
+import {
+  signUp,
+  login,
+  allUsers,
+  deleteUser,
+} from "../controllers/user.controller.js";
 
 import validateLogin from "../middlewares/loginValidation.js";
 import { upload } from "../services/fileUpload.js";
@@ -20,4 +25,5 @@ adminRouter
   );
 
 adminRouter.route("/users").get(isAuthenticated, isAdmin, allUsers);
+adminRouter.route("/:id").delete(isAuthenticated, isAdmin, deleteUser);
 export default adminRouter;

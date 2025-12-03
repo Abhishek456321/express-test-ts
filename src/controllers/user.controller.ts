@@ -78,3 +78,92 @@ export const allUsers = async (req: Request, res: Response) => {
     res.json({ success: false, message: "server/db error." });
   }
 };
+export const getUserById = async (req: Request, res: Response) => {
+  const id = req.params.id;
+  if (!id) {
+    return res.json({ success: false, message: "user not specified" });
+  }
+  try {
+    const user = await userModel.findById(id).select(["-password", "-role"]);
+    if (user) {
+      return res.json({ success: true, data: user });
+    }
+  } catch (error) {
+    return res.json({ success: false, message: "server/db error." });
+  }
+};
+export const deleteUser = async (req: Request, res: Response) => {
+  const id = req.params.id;
+  if (!id) {
+    return res.json({ success: false, message: "user not specified" });
+  }
+  try {
+    const user = await userModel.findByIdAndDelete(id);
+    if (user) {
+      return res.json({ success: true, message: "user deleted successfully." });
+    }
+  } catch (error) {
+    return res.json({ success: false, message: "server/db error." });
+  }
+};
+export const updatePassword = async (req: Request, res: Response) => {
+  const email = req.body.email;
+  const oldPassword = req.body.oldPassword;
+  const newPassword = req.body.newPassword;
+  try {
+    const user = await userModel.findOne({ email });
+    if (user) {
+      const isMatch = await compareHashPassword(
+        oldPassword,
+        user.password as string
+      );
+      if (isMatch) {
+        const newHashedPassword = await hashPassword(newPassword);
+        const updatedUser = await userModel.findByIdAndUpdate(
+          user._id,
+          {
+            password: newHashedPassword,
+          },
+          { new: true }
+        );
+        if (updatedUser) {
+          return res.json({
+            success: true,
+            message: `${updatedUser.role} updated successfully.`,
+          });
+        }
+      } else {
+        return res.json({ success: false, message: "invalid credentials." });
+      }
+    } else {
+      return res.json({ success: false, message: "user doesnot exists." });
+    }
+  } catch (error) {
+    return res.json({ success: false, message: "server/db error." });
+  }
+};
+
+// edit user details.
+
+export const editProfile = async (req: Request, res: Response) => {
+  const id = req?.user?.id;
+  const editValue = req.body;
+  if (id && editValue) {
+    try {
+      const newProfile = await userModel
+        .findByIdAndUpdate(id, editValue, {
+          new: true,
+        })
+        .select("-password");
+      if (!newProfile)
+        return res.json({ success: false, message: "edit action failed." });
+      return res.json({
+        success: true,
+        message: "edit successfull",
+        data: newProfile,
+      });
+    } catch (error) {
+      return res.json({ success: false, message: "server/db error." });
+    }
+  }
+};
