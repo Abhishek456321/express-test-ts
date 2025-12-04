@@ -10,7 +10,7 @@ const seedAdmin = async () => {
 
     try {
       const admin = await userModel.create({
-        username: "Abhishek khadka",
+        username: process.env.ADMIN_USER_NAME as string,
         email: process.env.ADMIN_EMAIL as string,
         password: hashedPassword,
         role: "admin",

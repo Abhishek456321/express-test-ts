@@ -55,6 +55,7 @@ export const login = async (req: Request, res: Response) => {
           success: true,
           message: `${user.role} login successfully.`,
           token,
+          role: user.role,
         });
         return;
       } else {

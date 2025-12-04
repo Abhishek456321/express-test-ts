@@ -18,8 +18,9 @@ const userRouter = Router();
 userRouter
   .route("/")
   .post(validateCreation, upload.single("image"), signUp)
-  .get(validateLogin, login)
+
   .patch(updatePassword);
 userRouter.route("/edit").patch(isAuthenticated, editProfile);
+userRouter.route("/login").post(validateLogin, login);
 userRouter.route("/:id").get(isAuthenticated, getUserById);
 export default userRouter;
